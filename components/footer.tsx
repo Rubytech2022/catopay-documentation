@@ -16,14 +16,14 @@ export function Footer() {
             >
               nisabmohd
             </Link>
-            . The source code is available on{" "}
+            and Modified by
             <Link
               className="px-1 underline underline-offset-2"
-              href="https://github.com/nisabmohd/Aria-Docs"
+              href="https://github.com/musiur"
             >
-              GitHub
+              musiur
             </Link>
-            .
+            For Catopay.
           </p>
         </div>
 
@@ -39,18 +39,11 @@ export function FooterButtons() {
   return (
     <>
       <Link
-        href="https://vercel.com/templates/next.js/documentation-template"
-        className={buttonVariants({ variant: "outline", size: "sm" })}
-      >
-        <TriangleIcon className="h-[0.8rem] w-4 mr-2 text-primary fill-current" />
-        Deploy
-      </Link>
-      <Link
-        href="https://github.com/sponsors/nisabmohd"
+        href="https://catopay.com"
         className={buttonVariants({ variant: "outline", size: "sm" })}
       >
         <HeartIcon className="h-4 w-4 mr-2 text-red-600 fill-current" />
-        Sponsor
+        Visit Us
       </Link>
     </>
   );
