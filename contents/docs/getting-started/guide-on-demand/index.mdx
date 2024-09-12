@@ -34,17 +34,17 @@ const axios = require("axios");
 const apiEndpoint = "https://api.catopay.com/api/v1/payment/create";
 
 const response = await axios.get(
-apiEndpoint,
-{
-headers: {
-"Content-Type": "application/json",
-"x-api-key": APIKEY, // Replace APIKEY with your actual API key
-},
-}
+  apiEndpoint,
+    {
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": APIKEY, // Replace APIKEY with your actual API key
+    },
+  }
 );
 console.log(response.data); // List of available payment methods
 
-````
+```
   </TabsContent>
 </Tabs>
 
@@ -65,28 +65,28 @@ To create a payment, use the following POST endpoint. You can also include the o
   </TabsList>
   <TabsContent value="js">
 ```javascript showLineNumbers
-const axios = require("axios");
-const apiEndpoint = "https://api.catopay.com/api/v1/payment/create";
+  const axios = require("axios");
+  const apiEndpoint = "https://api.catopay.com/api/v1/payment/create";
 
-const response = await axios.post(
-  apiEndpoint,
-  {
-    amount: 100, // Amount to be charged
-    description: "Payment for services", // Description of the transaction
-    redirect_url: "https://your-domain/payment_endpoint", // Your custom redirect URL
-    callback_url: "__your__callback__endpoint__", // Your server's callback URL
-    paymentMethodId: "__select__from__fetched__payment__methods__", // ID from fetched methods
-    note: "This is a custom note for the payment", // Optional note about the transaction
-  },
-  {
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": "__your__api__key__", // Replace with your actual API key
+  const response = await axios.post(
+    apiEndpoint,
+    {
+      amount: 100, // Amount to be charged
+      description: "Payment for services", // Description of the transaction
+      redirect_url: "https://your-domain/payment_endpoint", // Your custom redirect URL
+      callback_url: "__your__callback__endpoint__", // Your server's callback URL
+      paymentMethodId: "__select__from__fetched__payment__methods__", // ID from fetched methods
+      note: "This is a custom note for the payment", // Optional note about the transaction
     },
-  }
-);
+    {
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": "__your__api__key__", // Replace with your actual API key
+      },
+    }
+  );
 
-console.log(response.data); // Response will contain payment details including payment_url
+  console.log(response.data); // Response will contain payment details including payment_url
 ```
   </TabsContent>
 </Tabs>
@@ -128,9 +128,9 @@ callback_url + `?transactionId=${transactionId}&status=${status}&note=${note}`
 
 **Example URL:**
 
-`
+```
 https://your-server.com/payment_callback?transactionId=12345&status=success&note=Custom%20Note
-`
+```
 
 ---
 
@@ -145,9 +145,6 @@ https://your-server.com/payment_callback?transactionId=12345&status=success&note
 
 For more advanced use cases, visit the [Catopay developer portal](https://catopay.com/dashboard/api-keys).
 
+---
 
 Thanks for being with us!
-
--
--
-````
