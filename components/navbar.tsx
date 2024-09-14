@@ -18,10 +18,10 @@ export const NAVLINKS: { title: string; href: string; external?: boolean }[] = [
     title: "Documentation",
     href: `/docs${page_routes[0].href}`,
   },
-  {
-    title: "Blog",
-    href: "/blog",
-  },
+  // {
+  //   title: "Blog",
+  //   href: "/blog",
+  // },
   // {
   //   title: "Examples",
   //   href: "#",
