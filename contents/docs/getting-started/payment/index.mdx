@@ -59,7 +59,7 @@ const response = await axios.post("https://api.catopay.com/api/v1/payment/create
     callback_url: "__your__callback__endpoint__",  // Your server's callback URL
     paymentMethodId: "__select__from__fetched__payment__methods__",  // ID from fetched methods
     note: "This is a custom note for the payment",  // Optional custom note
-    suggested_numbers: "1234567890,0987654321"  // Comma-separated numbers for the transaction page
+
 }, {
     headers: {
         "Content-Type": "application/json",
@@ -77,7 +77,7 @@ console.log(response.data);  // Response includes the payment_url
 Once the payment request is created, the response will include a `payment_url`. Redirect the user to this URL to complete the payment.
 
 **Updated Flexibility for Suggested Numbers:**
-- You can provide one or more suggested numbers using the `suggested_numbers` parameter in the request.
+- You can provide one or more suggested numbers using the `numbers` parameter in the request.
 - These numbers will be displayed on the transaction submission page, and the user can select one.
 - If you don't provide any numbers, the user will see an empty field where they can manually enter a number.
 
@@ -116,7 +116,7 @@ You can also add any custom parameters to your callback URL based on your applic
 ### Key Points
 
 - Keep your **API key** secure.
-- If you use `suggested_numbers`, they will be shown on the transaction page, allowing users to choose from them or enter a number manually if not provided.
+- If you use `numbers`, they will be shown on the transaction page, allowing users to choose from them or enter a number manually if not provided.
 - The `callback_url` can include any custom parameters, but Catopay will add `transactionId` and `status` to it.
 
 ---
