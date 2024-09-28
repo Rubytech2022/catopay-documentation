@@ -13,13 +13,14 @@ export const ROUTES: EachRoute[] = [
     href: "/getting-started",
     noLink: true,
     items: [
-      { title: "Guide On Demand", href: "/guide-on-demand" },
+      { title: "Payment", href: "/payment" },
+      { title: "Refund", href: "/refund" },
       // { title: "Introduction", href: "/introduction" },
       // {
       //   title: "Installation",
       //   href: "/installation",
       //   items: [
-      //     { title: "Laravel", href: "/laravel" },
+      //     { title: "Laravel", href: "/laravel" },w
       //     { title: "React", href: "/react" },
       //     { title: "Gatsby", href: "/gatsby" },
       //   ],

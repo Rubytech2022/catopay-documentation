@@ -1,0 +1,127 @@
+---
+title: Payment API Documentation
+description: Welcome to the updated Catopay Payment API documentation. Follow these steps to seamlessly integrate Catopay's payment services into your application.
+---
+### Payment (Updated)
+
+This guide will help you integrate Catopay's payment API into your application, allowing you to create payment requests, handle responses, and manage payment processes effectively.
+
+---
+
+### 1. Prepare Your Catopay API Key
+
+First, generate your API key from the Catopay Dashboard:
+
+- Log in to your Catopay Dashboard.
+- Go to the **API Keys** tab.
+- Click **Generate** to create an API key.
+- Use this API key for authentication in all API requests.
+
+---
+
+### 2. Fetch All Payment Methods
+
+Before creating a payment request, fetch the available payment methods using a GET request.
+
+**Endpoint:**  
+`GET https://api.catopay.com/api/v1/payment/methods`
+
+**Sample Code (Using Axios):**
+```javascript
+const axios = require('axios');
+
+const response = await axios.get("https://api.catopay.com/api/v1/payment/methods", {
+    headers: {
+        "Content-Type": "application/json",
+        "x-api-key": APIKEY  // Replace APIKEY with your actual API key
+    }
+});
+console.log(response.data);  // List of available payment methods
+```
+
+---
+
+### 3. Create a Payment Request
+
+Use this POST request to create a payment. You can include an optional `note` and pass suggested numbers that will show up on the transaction submission page.
+
+**Endpoint:**  
+`POST https://api.catopay.com/api/v1/payment/create`
+
+**Request Payload:**
+```javascript
+const axios = require('axios');
+
+const response = await axios.post("https://api.catopay.com/api/v1/payment/create", {
+    amount: 100,  // Amount to be charged
+    description: "Payment for services",  // Description of the transaction
+    redirect_url: "https://your-domain/payment_endpoint",  // Your custom redirect URL
+    callback_url: "__your__callback__endpoint__",  // Your server's callback URL
+    paymentMethodId: "__select__from__fetched__payment__methods__",  // ID from fetched methods
+    note: "This is a custom note for the payment",  // Optional custom note
+    suggested_numbers: "1234567890,0987654321"  // Comma-separated numbers for the transaction page
+}, {
+    headers: {
+        "Content-Type": "application/json",
+        "x-api-key": "__your__api__key__"  // Replace with your actual API key
+    }
+});
+
+console.log(response.data);  // Response includes the payment_url
+```
+
+---
+
+### 4. Redirect User to Payment URL
+
+Once the payment request is created, the response will include a `payment_url`. Redirect the user to this URL to complete the payment.
+
+**Updated Flexibility for Suggested Numbers:**
+- You can provide one or more suggested numbers using the `suggested_numbers` parameter in the request.
+- These numbers will be displayed on the transaction submission page, and the user can select one.
+- If you don't provide any numbers, the user will see an empty field where they can manually enter a number.
+
+**Example Redirect:**
+```javascript
+window.location.href = response.data.payment_url;  // Redirect to the payment page
+```
+
+---
+
+### 5. Handle Redirect and Callback URLs
+
+After the payment is processed:
+
+- **Redirect to `redirect_url`**: Once the user submits their payment, they will be redirected to your `redirect_url`.
+- **Server-to-Server Callback to `callback_url`**: After confirming the transaction, Catopay will call your provided callback URL with two additional parameters:
+  - `transactionId`: The unique identifier for the transaction.
+  - `status`: The status of the transaction (e.g., success, pending, failed).
+
+**Updated Callback Example:**
+
+Catopay will append the following parameters to your callback URL:
+```
+callback_url + `?transactionId=${transactionId}&status=${status}`
+```
+
+**Example Callback URL:**
+```
+https://your-server.com/payment_callback?transactionId=12345&status=success
+```
+
+You can also add any custom parameters to your callback URL based on your application's needs. Catopay will only append the `transactionId` and `status` parameters.
+
+---
+
+### Key Points
+
+- Keep your **API key** secure.
+- If you use `suggested_numbers`, they will be shown on the transaction page, allowing users to choose from them or enter a number manually if not provided.
+- The `callback_url` can include any custom parameters, but Catopay will add `transactionId` and `status` to it.
+
+---
+
+For more details on advanced use cases, please visit the Catopay developer portal.
+
+
+💖 Thanks for being with us! 

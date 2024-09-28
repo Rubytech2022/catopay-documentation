@@ -1,0 +1,94 @@
+---
+title: Refund API Documentation
+description: This guide outlines how to integrate the Catopay Refund API into your application to handle refunds for payments.
+---
+
+
+
+---
+
+### 1. Prepare Your Catopay API Key
+
+To use the refund API, generate an API key from the Catopay Dashboard:
+
+- Log in to your Catopay Dashboard.
+- Navigate to the **API Keys** tab.
+- Click **Generate** to create your API key.
+- Use this API key for all API requests, including fetching payment methods and creating refunds.
+
+---
+
+### 2. Fetch Payment Methods
+
+Before creating a refund, you must fetch the available payment methods to get the `paymentMethodId` needed for the refund request.
+
+**Endpoint:**  
+`GET https://api.catopay.com/api/v1/payment/methods`
+
+**Sample Code (Using Axios):**
+```javascript
+const axios = require('axios');
+
+const response = await axios.get("https://api.catopay.com/api/v1/payment/methods", {
+    headers: {
+        "Content-Type": "application/json",
+        "x-api-key": APIKEY  // Replace APIKEY with your actual API key
+    }
+});
+console.log(response.data);  // List of available payment methods
+```
+
+Use the `paymentMethodId` from the response in your refund request.
+
+---
+
+### 3. Create a Refund Request
+
+Once you have the `paymentMethodId`, use the following POST request to initiate a refund.
+
+**Endpoint:**  
+`POST https://api.catopay.com/api/v1/refund/create`
+
+**Request Payload:**
+```json
+{
+    "amount": 99,  // Amount to refund
+    "paymentMethodId": "668ec9848872303a38e59907",  // ID of the payment method (from the previous step)
+    "refundReason": "Product defect",  // Reason for the refund
+    "accountType": "PERSONAL_ACCOUNT",  // Account type (choose from PERSONAL_ACCOUNT, BUSINESS_ACCOUNT, AGENT_ACCOUNT, MERCHANT_ACCOUNT)
+    "bankNumberOrAddress": "1234567890"  // Bank number or address for refund
+}
+```
+
+**Sample Code (Using Axios):**
+```javascript
+const axios = require('axios');
+
+const response = await axios.post("https://api.catopay.com/api/v1/refund/create", {
+    amount: 99,  // Amount to refund
+    paymentMethodId: "668ec9848872303a38e59907",  // ID of the payment method
+    refundReason: "Product defect",  // Reason for the refund
+    accountType: "PERSONAL_ACCOUNT",  // Account type (PERSONAL_ACCOUNT, BUSINESS_ACCOUNT, AGENT_ACCOUNT, MERCHANT_ACCOUNT)
+    bankNumberOrAddress: "1234567890"  // Bank number or address for refund
+}, {
+    headers: {
+        "Content-Type": "application/json",
+        "x-api-key": APIKEY  // Replace with your actual API key
+    }
+});
+
+console.log(response.data);  // Response will contain refund status and details
+```
+
+---
+
+### Key Points
+
+- **API Key**: Pass the API key in the request header as `"x-api-key"`.
+- **Payment Method**: Fetch the payment methods first and use the `paymentMethodId` from the response in the refund request.
+- **Account Types**: Specify the correct account type in the `accountType` field. Valid options are `PERSONAL_ACCOUNT`, `BUSINESS_ACCOUNT`, `AGENT_ACCOUNT`, and `MERCHANT_ACCOUNT`.
+- **Refund Reason**: Always provide a valid reason for the refund in the `refundReason` field.
+
+---
+
+For additional information and advanced use cases, visit the Catopay developer portal.
