@@ -1,6 +1,6 @@
 import { buttonVariants } from "@/components/ui/button";
 import { page_routes } from "@/lib/routes-config";
-import { MoveUpRightIcon, TerminalIcon } from "lucide-react";
+import { MoveUpRightIcon } from "lucide-react";
 import Link from "next/link";
 
 export default function Home() {

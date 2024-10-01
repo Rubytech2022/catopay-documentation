@@ -7,10 +7,10 @@ import { Footer } from "@/components/footer";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "AriaDocs - Template",
-  metadataBase: new URL("https://ariadocs.vercel.app/"),
+  title: "Catopay - Docs",
+  metadataBase: new URL("https://docs.catopay.com"),
   description:
-    "This comprehensive documentation template, crafted with Next.js and available as open-source, delivers a sleek and responsive design, tailored to meet all your project documentation requirements.",
+    "This comprehensive documentation, crafted that delivers a sleek and tailored presentation of technical and non-technical guide to integrate Catopay with any of your platform",
 };
 
 export default function RootLayout({
