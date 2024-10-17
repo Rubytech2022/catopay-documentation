@@ -1,94 +1,122 @@
 ---
 title: Refund API Documentation
-description: This guide outlines how to integrate the Catopay Refund API into your application to handle refunds for payments.
+description: This guide helps you create a refund request using Catopay's refund API. Follow these steps to fetch payment methods and initiate a refund, including cases where the wallet requires additional security.
 ---
-
-
 
 ---
 
 ### 1. Prepare Your Catopay API Key
 
-To use the refund API, generate an API key from the Catopay Dashboard:
+Generate your API key from the Catopay Dashboard:
 
 - Log in to your Catopay Dashboard.
-- Navigate to the **API Keys** tab.
-- Click **Generate** to create your API key.
-- Use this API key for all API requests, including fetching payment methods and creating refunds.
+- Navigate to the **Settings** page.
+- Copy your API key for all API requests.
 
 ---
 
 ### 2. Fetch Payment Methods
 
-Before creating a refund, you must fetch the available payment methods to get the `paymentMethodId` needed for the refund request.
+Before creating a refund request, you need to retrieve the available payment methods using the following GET request.
 
 **Endpoint:**  
 `GET https://api.catopay.com/api/v1/payment/methods`
 
 **Sample Code (Using Axios):**
+
 ```javascript
-const axios = require('axios');
+const axios = require("axios");
 
-const response = await axios.get("https://api.catopay.com/api/v1/payment/methods", {
+const response = await axios.get(
+  "https://api.catopay.com/api/v1/payment/methods",
+  {
     headers: {
-        "Content-Type": "application/json",
-        "x-api-key": APIKEY  // Replace APIKEY with your actual API key
-    }
-});
-console.log(response.data);  // List of available payment methods
+      "Content-Type": "application/json",
+      "x-api-key": APIKEY, // Replace APIKEY with your actual API key
+    },
+  }
+);
+console.log(response.data); // List of available payment methods
 ```
-
-Use the `paymentMethodId` from the response in your refund request.
 
 ---
 
 ### 3. Create a Refund Request
 
-Once you have the `paymentMethodId`, use the following POST request to initiate a refund.
+Use the following POST request to create a refund. There are two cases to handle:
+
+- **Without Wallet Secret**: The default process.
+- **With Wallet Secret**: If the user's wallet has Secret enabled, you must include the `walletSecret` field in the payload.
 
 **Endpoint:**  
 `POST https://api.catopay.com/api/v1/refund/create`
 
+#### Case 1: Without Wallet Secret
+
+For users who do not have a wallet secret enabled, use the following payload.
+
 **Request Payload:**
-```json
-{
-    "amount": 99,  // Amount to refund
-    "paymentMethodId": "668ec9848872303a38e59907",  // ID of the payment method (from the previous step)
-    "refundReason": "Product defect",  // Reason for the refund
-    "accountType": "PERSONAL_ACCOUNT",  // Account type (choose from PERSONAL_ACCOUNT, BUSINESS_ACCOUNT, AGENT_ACCOUNT, MERCHANT_ACCOUNT)
-    "bankNumberOrAddress": "1234567890"  // Bank number or address for refund
-}
+
+```javascript
+const axios = require("axios");
+
+const response = await axios.post(
+  "https://api.catopay.com/api/v1/refund/create",
+  {
+    amount: 99, // Refund amount
+    paymentMethodId: "668ec9848872303a38e59907", // Retrieved payment method ID
+    refundReason: "Product defect", // Reason for refund
+    accountType: "PERSONAL_ACCOUNT", // Account type: PERSONAL_ACCOUNT, BUSINESS_ACCOUNT, etc.
+    bankNumberOrAddress: "1234567890", // Bank account number or address
+  },
+  {
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": "__your__api__key__", // Replace with your actual API key
+    },
+  }
+);
+
+console.log(response.data); // Response will confirm refund creation
 ```
 
-**Sample Code (Using Axios):**
+#### Case 2: With Wallet Secret
+
+If the user's wallet has Secret enabled, add the `walletSecret` field to the payload.
+
+**Request Payload (With Wallet Secret):**
+
 ```javascript
-const axios = require('axios');
+const axios = require("axios");
 
-const response = await axios.post("https://api.catopay.com/api/v1/refund/create", {
-    amount: 99,  // Amount to refund
-    paymentMethodId: "668ec9848872303a38e59907",  // ID of the payment method
-    refundReason: "Product defect",  // Reason for the refund
-    accountType: "PERSONAL_ACCOUNT",  // Account type (PERSONAL_ACCOUNT, BUSINESS_ACCOUNT, AGENT_ACCOUNT, MERCHANT_ACCOUNT)
-    bankNumberOrAddress: "1234567890"  // Bank number or address for refund
-}, {
+const response = await axios.post(
+  "https://api.catopay.com/api/v1/refund/create",
+  {
+    amount: 99, // Refund amount
+    paymentMethodId: "668ec9848872303a38e59907", // Retrieved payment method ID
+    refundReason: "Product defect", // Reason for refund
+    accountType: "PERSONAL_ACCOUNT", // Account type: PERSONAL_ACCOUNT, BUSINESS_ACCOUNT, etc.
+    bankNumberOrAddress: "1234567890", // Bank account number or address
+    walletSecret: "YourWalletSecret", // Wallet secret for enabled accounts
+  },
+  {
     headers: {
-        "Content-Type": "application/json",
-        "x-api-key": APIKEY  // Replace with your actual API key
-    }
-});
+      "Content-Type": "application/json",
+      "x-api-key": "__your__api__key__", // Replace with your actual API key
+    },
+  }
+);
 
-console.log(response.data);  // Response will contain refund status and details
+console.log(response.data); // Response will confirm refund creation
 ```
 
 ---
 
 ### Key Points
 
-- **API Key**: Pass the API key in the request header as `"x-api-key"`.
-- **Payment Method**: Fetch the payment methods first and use the `paymentMethodId` from the response in the refund request.
-- **Account Types**: Specify the correct account type in the `accountType` field. Valid options are `PERSONAL_ACCOUNT`, `BUSINESS_ACCOUNT`, `AGENT_ACCOUNT`, and `MERCHANT_ACCOUNT`.
-- **Refund Reason**: Always provide a valid reason for the refund in the `refundReason` field.
+- **Keep your API key secure**: Never expose your API key publicly.
+- **Wallet Secret**: If your wallet has Secret enabled, you must pass the `walletSecret` field in the refund request.
+- **Double-Check Payment Method**: Ensure the `paymentMethodId` is retrieved correctly from the payment methods endpoint before using it in the refund request.
+- **Server-Side API Calls**: Always make API calls from your server. Avoid using client-side code (like in the browser or mobile app) for API requests, as this can expose sensitive information, including your API key and wallet secrets.
 
 ---
-
-For additional information and advanced use cases, visit the Catopay developer portal.

@@ -2,26 +2,20 @@
 title: Payment API Documentation
 description: Welcome to the updated Catopay Payment API documentation. Follow these steps to seamlessly integrate Catopay's payment services into your application.
 ---
-### Payment (Updated)
-
-This guide will help you integrate Catopay's payment API into your application, allowing you to create payment requests, handle responses, and manage payment processes effectively.
-
----
 
 ### 1. Prepare Your Catopay API Key
 
-First, generate your API key from the Catopay Dashboard:
+Generate your API key from the Catopay Dashboard:
 
 - Log in to your Catopay Dashboard.
-- Go to the **API Keys** tab.
-- Click **Generate** to create an API key.
-- Use this API key for authentication in all API requests.
+- Navigate to the **Settings** page.
+- Copy your API key for all API requests, including payment creation, retrieval, and callback handling.
 
 ---
 
-### 2. Fetch All Payment Methods
+### 2. Fetch Payment Methods
 
-Before creating a payment request, fetch the available payment methods using a GET request.
+Before creating a payment request, retrieve the available payment methods using the following GET request.
 
 **Endpoint:**  
 `GET https://api.catopay.com/api/v1/payment/methods`
@@ -43,7 +37,7 @@ console.log(response.data);  // List of available payment methods
 
 ### 3. Create a Payment Request
 
-Use this POST request to create a payment. You can include an optional `note` and pass suggested numbers that will show up on the transaction submission page.
+Use the following POST request to create a payment, including optional numbers for transaction submission.
 
 **Endpoint:**  
 `POST https://api.catopay.com/api/v1/payment/create`
@@ -57,9 +51,8 @@ const response = await axios.post("https://api.catopay.com/api/v1/payment/create
     description: "Payment for services",  // Description of the transaction
     redirect_url: "https://your-domain/payment_endpoint",  // Your custom redirect URL
     callback_url: "__your__callback__endpoint__",  // Your server's callback URL
-    paymentMethodId: "__select__from__fetched__payment__methods__",  // ID from fetched methods
-    note: "This is a custom note for the payment",  // Optional custom note
-
+    paymentMethodId: "__select__from__fetched__payment__methods__",  // Payment method ID
+    numbers: "1234567890,0987654321"  // Comma-separated numbers for transaction page (optional)
 }, {
     headers: {
         "Content-Type": "application/json",
@@ -67,7 +60,7 @@ const response = await axios.post("https://api.catopay.com/api/v1/payment/create
     }
 });
 
-console.log(response.data);  // Response includes the payment_url
+console.log(response.data);  // Response will include the payment URL
 ```
 
 ---
@@ -76,10 +69,8 @@ console.log(response.data);  // Response includes the payment_url
 
 Once the payment request is created, the response will include a `payment_url`. Redirect the user to this URL to complete the payment.
 
-**Updated Flexibility for Suggested Numbers:**
-- You can provide one or more suggested numbers using the `numbers` parameter in the request.
-- These numbers will be displayed on the transaction submission page, and the user can select one.
-- If you don't provide any numbers, the user will see an empty field where they can manually enter a number.
+- You can provide numbers in the `numbers` parameter, which will appear on the transaction submission page.
+- If no numbers are provided, the user will see an empty field for manual input.
 
 **Example Redirect:**
 ```javascript
@@ -88,40 +79,81 @@ window.location.href = response.data.payment_url;  // Redirect to the payment pa
 
 ---
 
-### 5. Handle Redirect and Callback URLs
+### 5. Handle Redirect and Retrieve Payment Information
 
-After the payment is processed:
+After payment processing, the user will be redirected to your specified `redirect_url`. The **transaction ID** will be appended to the redirect URL, but **no status** will be included. 
 
-- **Redirect to `redirect_url`**: Once the user submits their payment, they will be redirected to your `redirect_url`.
-- **Server-to-Server Callback to `callback_url`**: After confirming the transaction, Catopay will call your provided callback URL with two additional parameters:
-  - `transactionId`: The unique identifier for the transaction.
-  - `status`: The status of the transaction (e.g., success, pending, failed).
+You must retrieve the payment details using the following endpoint before using any information like the status.
 
-**Updated Callback Example:**
+**Retrieve Payment Details Endpoint:**  
+`GET http://api.catopay.com/api/v1/payment/retrieve/:transactionId`
 
-Catopay will append the following parameters to your callback URL:
+**Sample Code (Using Axios):**
+```javascript
+const axios = require('axios');
+
+const transactionId = "66f7b981f3f5e1fa9dd364c1";  // Replace with the actual transaction ID
+
+const response = await axios.get(`http://api.catopay.com/api/v1/payment/retrieve/${transactionId}`, {
+    headers: {
+        "Content-Type": "application/json",
+        "x-api-key": APIKEY  // Replace with your actual API key
+    }
+});
+
+console.log(response.data);  // Contains the payment details, including status
 ```
-callback_url + `?transactionId=${transactionId}&status=${status}`
-```
 
-**Example Callback URL:**
-```
-https://your-server.com/payment_callback?transactionId=12345&status=success
-```
+---
 
-You can also add any custom parameters to your callback URL based on your application's needs. Catopay will only append the `transactionId` and `status` parameters.
+### 6. Handle Callback URL and Retrieve Payment Information
+
+After the payment is processed, Catopay will send a callback to your `callback_url`, including the following parameters:
+
+- `transactionId`: Unique identifier for the transaction.
+- `status`: Current status of the transaction.
+
+Even though the status is provided in the callback, **you must retrieve the payment information** from the `/payment/retrieve/:transactionId` endpoint to ensure data integrity before using it.
+
+**Example Callback Handling:**
+```javascript
+app.post('/payment_callback', async (req, res) => {
+    const { transactionId, status } = req.query;
+
+    // Retrieve the payment details to confirm the status
+    const paymentDetails = await axios.get(`http://api.catopay.com/api/v1/payment/retrieve/${transactionId}`, {
+        headers: {
+            "x-api-key": APIKEY  // Replace with your actual API key
+        }
+    });
+
+    // Double-check the payment status
+    const actualStatus = paymentDetails.data.data.status;
+
+    // Take action based on the actual status
+    if (actualStatus === 'Completed') {
+        // Handle successful payment
+    } else if (actualStatus === 'Failed') {
+        // Handle failed payment
+    }
+
+    res.status(200).send('Callback received');
+});
+```
 
 ---
 
 ### Key Points
 
-- Keep your **API key** secure.
-- If you use `numbers`, they will be shown on the transaction page, allowing users to choose from them or enter a number manually if not provided.
-- The `callback_url` can include any custom parameters, but Catopay will add `transactionId` and `status` to it.
+- **Keep your API key secure**: Never expose your API key publicly.
+- **Retrieve Payment Information**: Always retrieve payment information using the `transactionId` before relying on any status from redirects or callbacks.
+- **Numbers Parameter**: If you use the `numbers` field, they will appear on the transaction page for users to select or enter manually if no numbers are provided.
+- **Double-Check Status**: Even if the callback provides a status, always confirm it by fetching the payment details to avoid potential fraud or manipulation.
+- **Callback URL Customization**: The `callback_url` can include custom parameters, but Catopay will add `transactionId` and `status` to it for security.
+- **Server-Side API Calls**: Always make API calls from your server. Avoid using client-side code (like in the browser or mobile app) for API requests, as this can expose sensitive information, including your API key and wallet secrets.
 
 ---
 
 For more details on advanced use cases, please visit the Catopay developer portal.
 
-
-💖 Thanks for being with us! 
+💖 Thanks for being with us!
