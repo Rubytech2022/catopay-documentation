@@ -12,7 +12,7 @@ Generate your API key from the Catopay Dashboard:
 - Log in to your Catopay Dashboard.
 - Navigate to the **Settings** page.
 - Copy your API key for all API requests.
-
+- Handle Callback URL and Retrieve Refund Information
 ---
 
 ### 2. Fetch Payment Methods
@@ -80,34 +80,39 @@ const response = await axios.post(
 console.log(response.data); // Response will confirm refund creation
 ```
 
-#### Case 2: With Wallet Secret
+### 4. Handle Callback URL and Retrieve Refund Information
 
-If the user's wallet has Secret enabled, add the `walletSecret` field to the payload.
+After the refund is processed, Catopay will send a callback to your `callback_url`, including the following parameters:
 
-**Request Payload (With Wallet Secret):**
+- `transactionId`: Unique identifier for the transaction.
+- `status`: Current status of the transaction.
 
+Even though the status is provided in the callback, **you must retrieve the refund information** from the `/refund/retrieve/:transactionId` endpoint to ensure data integrity before using it.
+
+**Example Callback Handling:**
 ```javascript
-const axios = require("axios");
+app.post('/refund_callback', async (req, res) => {
+    const { transactionId, status } = req.query;
 
-const response = await axios.post(
-  "https://api.catopay.com/api/v1/refund/create",
-  {
-    amount: 99, // Refund amount
-    paymentMethodId: "668ec9848872303a38e59907", // Retrieved payment method ID
-    refundReason: "Product defect", // Reason for refund
-    accountType: "PERSONAL_ACCOUNT", // Account type: PERSONAL_ACCOUNT, BUSINESS_ACCOUNT, etc.
-    bankNumberOrAddress: "1234567890", // Bank account number or address
-    walletSecret: "YourWalletSecret", // Wallet secret for enabled accounts
-  },
-  {
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": "__your__api__key__", // Replace with your actual API key
-    },
-  }
-);
+    // Retrieve the refund details to confirm the status
+    const refundDetails = await axios.get(`http://api.catopay.com/api/v1/refund/retrieve/${transactionId}`, {
+        headers: {
+            "x-api-key": APIKEY  // Replace with your actual API key
+        }
+    });
 
-console.log(response.data); // Response will confirm refund creation
+    // Double-check the payment status
+    const actualStatus = refundDetails.data.data.status;
+
+    // Take action based on the actual status
+    if (actualStatus === 'Completed') {
+        // Handle successful payment
+    } else if (actualStatus === 'Failed') {
+        // Handle failed payment
+    }
+
+    res.status(200).send('Callback received');
+});
 ```
 
 ---
