@@ -80,6 +80,9 @@ const response = await axios.post(
 console.log(response.data); // Response will confirm refund creation
 ```
 
+#### Case 2: With Wallet Secret
+Same as Case 1 but only add `walletSecret` in the payload.
+
 ### 4. Handle Callback URL and Retrieve Refund Information
 
 After the refund is processed, Catopay will send a callback to your `callback_url`, including the following parameters:
