@@ -67,7 +67,8 @@ const response = await axios.post(
     paymentMethodId: "668ec9848872303a38e59907", // Retrieved payment method ID
     refundReason: "Product defect", // Reason for refund
     accountType: "PERSONAL_ACCOUNT", // Account type: PERSONAL_ACCOUNT, BUSINESS_ACCOUNT, etc.
-    bankNumberOrAddress: "1234567890", // Bank account number or address
+    bankNumberOrAddress: "1234567890", // Bank account number or address,
+    callbackUrl: "https://your-callback-url.com",
   },
   {
     headers: {
