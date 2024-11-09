@@ -49,7 +49,7 @@ Use the following POST request to create a refund. There are two cases to handle
 - **With Wallet Secret**: If the user's wallet has Secret enabled, you must include the `walletSecret` field in the payload.
 
 **Endpoint:**  
-`POST https://api.catopay.com/api/v1/refund/create`
+`POST https://api.catopay.com/api/v1/refund/create-a-request`
 
 #### Case 1: Without Wallet Secret
 
@@ -61,7 +61,7 @@ For users who do not have a wallet secret enabled, use the following payload.
 const axios = require("axios");
 
 const response = await axios.post(
-  "https://api.catopay.com/api/v1/refund/create",
+  "https://api.catopay.com/api/v1/refund/create-a-request",
   {
     amount: 99, // Refund amount
     paymentMethodId: "668ec9848872303a38e59907", // Retrieved payment method ID
